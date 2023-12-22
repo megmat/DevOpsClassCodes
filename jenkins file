@@ -1,0 +1,47 @@
+pipeline {
+    agent any
+
+    tools {
+        // Install the Maven version configured as "M3" and add it to the path.
+        maven "mymaven"
+        jdk "myjava"
+    }
+
+    stages {
+        stage('compile') {
+            steps {
+                // Get some code from a GitHub repository
+                git 'https://github.com/edureka-git/DevOpsClassCodes.git'
+
+                // Run Maven on a Unix agent.
+                sh "mvn compile"
+
+                // To run Maven on a Windows agent, use
+                // bat "mvn -Dmaven.test.failure.ignore=true clean package"
+            }
+        stage('CodeReview'){
+            steps {
+                sh "mvn pmd:pmd"
+            }
+            }
+        stage('QA_Unit_Test'){
+            steps {
+                sh "mvn test"
+            }
+            }
+        stage('QA_METRICS_CHECK'){
+            steps {
+                sh "mvn cobertura:cobertura -Dcobertura.report.format=xml"
+            }
+            }
+        stage('QA_PACKAGE'){
+            steps {
+                sh "mvn package"
+            }
+            }
+        }
+    
+        }
+        
+    }
+}
